@@ -1,0 +1,66 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main","master"]
+  pull_request:
+    branches: [ "main","master"]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    env:
+      SOLUTION_FILE: Solution.sln
+
+    steps:
+    
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+     # Start up sqlserver
+    #- run: docker run --name Enova -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong!Passw0rd"  -p 1433:1433 -d mcr.microsoft.com/mssql/server:2019-latest
+    - run: docker run  -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=YourStrong!Passw0rd"  -p 1433:1433 -d mcr.microsoft.com/mssql/server:latest
+    - name: Set environment variables
+      run: |
+        echo "SONETA_TEST__SERVER=localhost" >> $GITHUB_ENV
+        echo "SONETA_TEST__USER=sa" >> $GITHUB_ENV
+        echo "SONETA_TEST__PASSWORD=YourStrong!Passw0rd" >> $GITHUB_ENV
+    
+
+    - name: List all files recursively
+      #run: find .
+      run: find . -name "*.sln"
+    
+    - name: List all files recursively
+      #run: find .
+      run: find . -name "*.csproj"
+
+    - name: Restore dependencies
+      run: dotnet restore $SOLUTION_FILE
+    - name: Build
+      run: dotnet build --no-restore $SOLUTION_FILE
+    
+    - name: Test
+      run: dotnet test --no-build --verbosity normal $SOLUTION_FILE
+    
+        
+    - name: Publish 
+      run: dotnet publish ./SonetaAddon/SonetaAddon/SonetaAddon.csproj -c Release -o publish_output
+
+    - name: Remove all files except .dll from publish_output
+      run: find publish_output -type f ! -name "*.dll" -delete
+          
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: publish_output

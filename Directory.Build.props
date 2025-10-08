@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<!-- wersja nuget i Framework -->
+	<PropertyGroup>
+		<SonetaPackageVersion>2504.2.3</SonetaPackageVersion>
+		<SonetaTargetFramework>net8.0</SonetaTargetFramework>
+		<SonetaTestsTargetFramework>net8.0</SonetaTestsTargetFramework>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	</PropertyGroup>
+
+	<!-- ścieżka do programu -->
+	<PropertyGroup>
+
+		<SonetaAddonStartProgram>D:\Soneta\enova365 2504.2.2\SonetaExplorer.exe</SonetaAddonStartProgram>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Today>$([System.DateTime]::UtcNow.ToString("MMdd"))</Today>
+		<YearPrefix>5</YearPrefix>
+		<Version>$(SonetaPackageVersion).$(YearPrefix)$(Today)</Version>
+
+	</PropertyGroup>
+</Project>
